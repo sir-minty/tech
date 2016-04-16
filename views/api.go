@@ -1,44 +1,50 @@
-package api
+package views
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+
+	apiError "github.com/sir-wiggles/auth/errors"
+	"github.com/sir-wiggles/auth/models"
 )
 
-var users = map[string]string{
-	"jeff": "asdf",
+type Context struct {
+	DB *sql.DB
 }
 
-type apiErr struct {
-	Error string `json:"error"`
+func NewContext() *Context {
+	return &Context{}
 }
 
-var LoginHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (c *Context) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	username := r.PostFormValue("username")
-	if username == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(apiErr{Error: "No username provided."})
-		return
-	}
-
 	password := r.PostFormValue("password")
-	if password == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(apiErr{Error: "No password provided."})
+	if username == "" {
+		c.ReturnError(w, apiError.MissingUsername)
+		return
+	} else if password == "" {
+		c.ReturnError(w, apiError.MissingPassword)
 		return
 	}
 
-	userPassword, ok := users[username]
-	if !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(apiErr{Error: "Username does not exist."})
+	user := &models.User{}
+
+	row := c.DB.QueryRow("SELECT * FROM user WHERE username=?", username)
+	if err := row.Scan(&user.ID, &user.Username, &user.Password); err != nil {
+		c.ReturnError(w, apiError.UsernameDoesNotExist)
 		return
 	}
 
-	if userPassword != password {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(apiErr{Error: "Invalid user credentials."})
+	if user.Password != password {
+		c.ReturnError(w, apiError.InvalidCredentials)
 		return
 	}
-})
+}
+
+func (c *Context) ReturnError(w http.ResponseWriter, e apiError.ApiError) {
+	json.NewEncoder(w).Encode(e.Error)
+	w.WriteHeader(e.StatusCode)
+	return
+}

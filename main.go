@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-
 	"github.com/sir-wiggles/auth/views"
 )
 
@@ -19,6 +18,8 @@ func main() {
 	keyPem := flag.String("key", "key.pem", "location of your key.pem file")
 	certPem := flag.String("cert", "cert.pem", "location of your cert.pem file")
 	flag.Parse()
+
+	api := views.NewContext()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/login", api.LoginHandler)
