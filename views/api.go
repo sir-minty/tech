@@ -44,7 +44,8 @@ func (c *Context) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Context) ReturnError(w http.ResponseWriter, e apiError.ApiError) {
-	json.NewEncoder(w).Encode(e.Error)
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(e.StatusCode)
+	json.NewEncoder(w).Encode(e)
 	return
 }

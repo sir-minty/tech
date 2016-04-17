@@ -1,30 +1,48 @@
 package errors
 
-import "net/http"
+import (
+	"bytes"
+	"encoding/json"
+	"log"
+	"net/http"
+)
 
 type ApiError struct {
-	Error      string `json:"error"`
+	ErrorMsg   string `json:"error"`
 	StatusCode int    `json:"-"`
+}
+
+func (a *ApiError) GoString() string {
+	w := bytes.NewBufferString("")
+	err := json.NewEncoder(w).Encode(a)
+	if err != nil {
+		log.Println(err)
+	}
+	return w.String()
+}
+
+func (a *ApiError) Error() string {
+	return a.GoString()
 }
 
 var (
 	MissingUsername = ApiError{
-		Error:      "No username provided.",
+		ErrorMsg:   "No username provided.",
 		StatusCode: http.StatusUnauthorized,
 	}
 
 	MissingPassword = ApiError{
-		Error:      "No password provided.",
+		ErrorMsg:   "No password provided.",
 		StatusCode: http.StatusUnauthorized,
 	}
 
 	UsernameDoesNotExist = ApiError{
-		Error:      "Username does not exist.",
+		ErrorMsg:   "Username does not exist.",
 		StatusCode: http.StatusUnauthorized,
 	}
 
 	InvalidCredentials = ApiError{
-		Error:      "Invalid user credentials.",
+		ErrorMsg:   "Invalid user credentials.",
 		StatusCode: http.StatusUnauthorized,
 	}
 )
