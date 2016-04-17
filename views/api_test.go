@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	ApiError "github.com/sir-wiggles/auth/errors"
-	"github.com/sir-wiggles/auth/views"
+	ApiError "github.com/sir-minty/tech/errors"
+	"github.com/sir-minty/tech/views"
 )
 
 func TestLoginHandler(t *testing.T) {

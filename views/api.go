@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"net/http"
 
-	apiError "github.com/sir-wiggles/auth/errors"
-	"github.com/sir-wiggles/auth/models"
+	apiError "github.com/sir-minty/tech/errors"
+	"github.com/sir-minty/tech/models"
 )
 
 type Context struct {
 	DB *sql.DB
 }
 
-func NewContext() *Context {
-	return &Context{}
+func NewContext(db *sql.DB) *Context {
+	return &Context{db}
 }
 
 func (c *Context) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,11 +41,19 @@ func (c *Context) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		c.ReturnError(w, apiError.InvalidCredentials)
 		return
 	}
+	resp := struct {
+		Message string
+	}{":D"}
+	c.ReturnResponse(w, resp)
 }
 
 func (c *Context) ReturnError(w http.ResponseWriter, e apiError.ApiError) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(e.StatusCode)
 	json.NewEncoder(w).Encode(e)
-	return
+}
+
+func (c *Context) ReturnResponse(w http.ResponseWriter, resp interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
