@@ -17,7 +17,7 @@ import (
 
 func main() {
 	ssl := flag.Bool("ssl", false, "flag enable ssl")
-	port := flag.String("port", "3000", "port to run server on")
+	port := flag.String("port", os.Getenv("PORT"), "port to run server on")
 	keyPem := flag.String("key", "key.pem", "location of your key.pem file")
 	certPem := flag.String("cert", "cert.pem", "location of your cert.pem file")
 

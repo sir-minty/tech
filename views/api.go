@@ -43,7 +43,7 @@ func (c *Context) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := struct {
 		Message string
-	}{":D"}
+	}{":D WHOOO!"}
 	c.ReturnResponse(w, resp)
 }
 
