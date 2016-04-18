@@ -37,7 +37,7 @@ func main() {
 		*dbhost, *dbport,
 		*dbname,
 	)
-	log.Println("Connecting to DB at %s", dbURL)
+	log.Printf("Connecting to DB at %s", dbURL)
 	db, err := sql.Open("mysql", dbURL)
 	if err != nil {
 		log.Fatal(err)
@@ -47,6 +47,7 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("DB Ping success")
 	c := views.NewContext(db)
 
 	r := mux.NewRouter()
