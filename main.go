@@ -19,6 +19,7 @@ import (
 func main() {
 	ssl := flag.Bool("ssl", false, "flag enable ssl")
 	port := flag.String("port", os.Getenv("PORT"), "port to run server on")
+	host := flag.String("host", os.Getenv("HOST"), "host to run server on")
 	keyPem := flag.String("key", "key.pem", "location of your key.pem file")
 	certPem := flag.String("cert", "cert.pem", "location of your cert.pem file")
 
@@ -48,11 +49,11 @@ func main() {
 	r.HandleFunc("/login", c.LoginHandler)
 
 	router := handlers.LoggingHandler(os.Stdout, r)
-	log.Printf("Serving on port :%s with ssl %t!", *port, *ssl)
+	log.Printf("Serving on port %s:%s with ssl %t", *host, *port, *ssl)
 
 	if *ssl {
-		http.ListenAndServeTLS(fmt.Sprintf(":%s", *port), *certPem, *keyPem, router)
+		http.ListenAndServeTLS(fmt.Sprintf("%s:%s", *host, *port), *certPem, *keyPem, router)
 	} else {
-		http.ListenAndServe(fmt.Sprintf(":%s", *port), router)
+		http.ListenAndServe(fmt.Sprintf("%s:%s", *host, *port), router)
 	}
 }
