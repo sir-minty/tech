@@ -1,5 +1,6 @@
 package main
 
+//
 import (
 	"database/sql"
 	"flag"
@@ -47,7 +48,7 @@ func main() {
 	r.HandleFunc("/login", c.LoginHandler)
 
 	router := handlers.LoggingHandler(os.Stdout, r)
-	log.Printf("Serving on port :%s with ssl %t", *port, *ssl)
+	log.Printf("Serving on port :%s with ssl %t!", *port, *ssl)
 
 	if *ssl {
 		http.ListenAndServeTLS(fmt.Sprintf(":%s", *port), *certPem, *keyPem, router)

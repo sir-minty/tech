@@ -1,0 +1,18 @@
+version: '2'
+services:
+        web:
+                build: .
+                ports:
+                        - "3000:3000"
+                volumes:
+                        - .:/go/src/app
+                depends_on:
+                        - mysqldb
+                environment:
+                        PORT: 3000
+        mysqldb:
+                image: mysql
+                volumes:
+                        - /tmp/appdatadir:/var/lib/mysql
+                environment:
+                        MYSQL_ROOT_PASSWORD: root
