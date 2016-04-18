@@ -23,24 +23,28 @@ func main() {
 	keyPem := flag.String("key", "key.pem", "location of your key.pem file")
 	certPem := flag.String("cert", "cert.pem", "location of your cert.pem file")
 
-	dbname := flag.String("db-name", "foobar", "db name")
-	dbport := flag.String("db-port", "3306", "db port")
-	dbhost := flag.String("db-host", "172.17.0.2", "db host url")
-	dbusername := flag.String("db-username", "root", "db username")
-	dbpassword := flag.String("db-password", "root", "db password")
+	dbname := flag.String("db-name", os.Getenv("DB_NAME"), "db name")
+	dbport := flag.String("db-port", os.Getenv("DB_PORT"), "db port")
+	dbhost := flag.String("db-host", os.Getenv("DB_HOST"), "db host")
+	dbusername := flag.String("db-username", os.Getenv("DB_USERNAME"), "db username")
+	dbpassword := flag.String("db-password", os.Getenv("DB_PASSWORD"), "db password")
 
 	flag.Parse()
 
 	dbURL := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s",
-		*dbusername,
-		*dbpassword,
-		*dbhost,
-		*dbport,
+		*dbusername, *dbpassword,
+		*dbhost, *dbport,
 		*dbname,
 	)
+	log.Println("Connecting to DB at %s", dbURL)
 	db, err := sql.Open("mysql", dbURL)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check that we can actually ping the DB
+	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
 	c := views.NewContext(db)
