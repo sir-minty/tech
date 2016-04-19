@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -38,16 +39,24 @@ func main() {
 		*dbname,
 	)
 	log.Printf("Connecting to DB at %s", dbURL)
-	db, err := sql.Open("mysql", dbURL)
-	if err != nil {
-		log.Fatal(err)
+	var db *sql.DB
+	backoff := 200
+	for attempt := 0; attempt < 5; attempt++ {
+		db, err := sql.Open("mysql", dbURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Check that we can actually ping the DB
+		if err := db.Ping(); err != nil {
+			log.Printf("Ping attempt %d, sleeping for %d: %s", attempt+1, backoff, err.Error())
+			time.Sleep(time.Millisecond * time.Duration(backoff))
+			backoff = backoff * 2
+			continue
+		}
+		break
 	}
 
-	// Check that we can actually ping the DB
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
-	log.Println("DB Ping success")
+	log.Println("Ping success")
 	c := views.NewContext(db)
 
 	r := mux.NewRouter()

@@ -1,20 +1,27 @@
 version: '2'
 services:
         web:
+                # Builds the Dockerfile in the current directory
                 build: .
+                # binds your host port to the containers port
                 ports:
-                        - "3000:3000"
+                        - 3000:3000
+                # Copy the current directory over to /go/src/app
                 volumes:
                         - .:/go/src/app
+                # Uses a file of env vars
                 env_file:
                         - ./app.env
+                # does not wait for service to be ready! Code must handle such cases.
                 depends_on:
                         - mysql
 
         mysql:
                 image: mysql:5.7
+                # copy the sql dir into this special directory so when mysql starts, it runs the sql files
                 volumes:
                         - ./sql:/docker-entrypoint-initdb.d
+                # Uses a data volume container to persist data
                 volumes_from:
                         - data
                 environment:
@@ -22,6 +29,7 @@ services:
                 depends_on:
                         - data
 
+        # very simple container that just stores data for mysql in this case
         data:
                 image: busybox
                 volumes:
