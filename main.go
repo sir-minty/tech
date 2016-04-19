@@ -40,11 +40,13 @@ func main() {
 	)
 	log.Printf("Connecting to DB at %s", dbURL)
 	var db *sql.DB
+	var err error
 	backoff := 200
 	for attempt := 0; attempt < 5; attempt++ {
-		db, err := sql.Open("mysql", dbURL)
+		db, err = sql.Open("mysql", dbURL)
 		if err != nil {
 			log.Fatal(err)
+			continue
 		}
 		// Check that we can actually ping the DB
 		if err := db.Ping(); err != nil {
