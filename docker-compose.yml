@@ -9,9 +9,13 @@ services:
                 # Copy the current directory over to /go/src/app
                 volumes:
                         - .:/go/src/app
-                # Uses a file of env vars
-                env_file:
-                        - ./app.env
+                environment:
+                        - DB_NAME=foobar
+                        - DB_PORT=3306
+                        - DB_HOST=mysql # note the name here is the same as the db section below
+                        - DB_USERNAME=root
+                        - DB_PASSWORD=root
+                        - PORT=3000
                 # does not wait for service to be ready! Code must handle such cases.
                 depends_on:
                         - mysql
